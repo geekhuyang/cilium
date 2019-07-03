@@ -53,7 +53,7 @@ func hashDatapath(dp datapath.Datapath, nodeCfg *datapath.LocalNodeConfiguration
 
 	// Writes won't fail; it's an in-memory hash.
 	if nodeCfg != nil {
-		_ = dp.WriteNodeConfig(d, nodeCfg)
+		_ = dp.WriteNodeConfig(d, nodeCfg, netdevCfg)
 	}
 	if netdevCfg != nil {
 		_ = dp.WriteNetdevConfig(d, netdevCfg)

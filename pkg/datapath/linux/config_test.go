@@ -89,7 +89,7 @@ func writeConfig(c *C, header string, write writeFn) {
 
 func (s *DatapathSuite) TestWriteNodeConfig(c *C) {
 	writeConfig(c, "node", func(w io.Writer, dp datapath.Datapath) error {
-		return dp.WriteNodeConfig(w, &dummyNodeCfg)
+		return dp.WriteNodeConfig(w, &dummyNodeCfg, &dummyDevCfg)
 	})
 }
 

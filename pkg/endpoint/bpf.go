@@ -1184,3 +1184,7 @@ func (e *Endpoint) RequireRouting() (required bool) {
 func (e *Endpoint) RequireEndpointRoute() bool {
 	return e.DatapathConfiguration.InstallEndpointRoute
 }
+
+func (e *Endpoint) GetCIDRPrefixLengths() (s6, s4 []int) {
+	return nil, nil
+}

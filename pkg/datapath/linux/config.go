@@ -49,7 +49,7 @@ func writeIncludes(w io.Writer) (int, error) {
 }
 
 // WriteNodeConfig writes the local node configuration to the specified writer.
-func (l *linuxDatapath) WriteNodeConfig(w io.Writer, cfg *datapath.LocalNodeConfiguration) error {
+func (l *linuxDatapath) WriteNodeConfig(w io.Writer, cfg *datapath.LocalNodeConfiguration, prefixLenMgr datapath.DeviceConfiguration) error {
 	fw := bufio.NewWriter(w)
 
 	writeIncludes(w)
@@ -221,19 +221,12 @@ func (l *linuxDatapath) WriteNodeConfig(w io.Writer, cfg *datapath.LocalNodeConf
 		fmt.Fprintf(fw, "#define NODEPORT_PORT_MAX_NAT %d\n", 65535)
 	}
 
-	return fw.Flush()
-}
-
-func (l *linuxDatapath) writeNetdevConfig(w io.Writer, cfg datapath.DeviceConfiguration) {
-	fmt.Fprint(w, cfg.GetOptions().GetFmtList())
-	if option.Config.IsFlannelMasterDeviceSet() {
-		fmt.Fprint(w, "#define HOST_REDIRECT_TO_INGRESS 1\n")
-	}
-
+	// TODO (ianvernon) shift this into writeNodeConfig.
+	// After that, remove GetPrefixLengths from DeviceConfiguration
 	// In case the Linux kernel doesn't support LPM map type, pass the set
 	// of prefix length for the datapath to lookup the map.
 	if ipcache.IPCache.MapType != bpf.BPF_MAP_TYPE_LPM_TRIE {
-		ipcachePrefixes6, ipcachePrefixes4 := cfg.GetCIDRPrefixLengths()
+		ipcachePrefixes6, ipcachePrefixes4 := prefixLenMgr.GetCIDRPrefixLengths()
 
 		fmt.Fprint(w, "#define IPCACHE6_PREFIXES ")
 		for _, prefix := range ipcachePrefixes6 {
@@ -245,6 +238,15 @@ func (l *linuxDatapath) writeNetdevConfig(w io.Writer, cfg datapath.DeviceConfig
 			fmt.Fprintf(w, "%d,", prefix)
 		}
 		fmt.Fprint(w, "\n")
+	}
+
+	return fw.Flush()
+}
+
+func (l *linuxDatapath) writeNetdevConfig(w io.Writer, cfg datapath.DeviceConfiguration) {
+	fmt.Fprint(w, cfg.GetOptions().GetFmtList())
+	if option.Config.IsFlannelMasterDeviceSet() {
+		fmt.Fprint(w, "#define HOST_REDIRECT_TO_INGRESS 1\n")
 	}
 }
 

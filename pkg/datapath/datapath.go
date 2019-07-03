@@ -31,7 +31,7 @@ type Datapath interface {
 
 	// WriteNodeConfig writes the implementation-specific configuration of
 	// node-wide options into the specified writer.
-	WriteNodeConfig(io.Writer, *LocalNodeConfiguration) error
+	WriteNodeConfig(io.Writer, *LocalNodeConfiguration, DeviceConfiguration) error
 
 	// WriteNetdevConfig writes the implementation-specific configuration
 	// of configurable options to the specified writer. Options specified
